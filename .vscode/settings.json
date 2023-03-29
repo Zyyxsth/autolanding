@@ -1,0 +1,8 @@
+{
+    "python.autoComplete.extraPaths": [
+        "/home/anifan/hiauto-landing/autolanding_ws/devel/lib/python3/dist-packages",
+        "/home/anifan/hiauto-landing/sim_gazebo_ws/devel/lib/python3/dist-packages",
+        "/home/anifan/hiauto-landing/husky_ws/devel/lib/python3/dist-packages",
+        "/opt/ros/noetic/lib/python3/dist-packages"
+    ]
+}

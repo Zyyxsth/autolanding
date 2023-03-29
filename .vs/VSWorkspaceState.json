@@ -1,0 +1,13 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\src",
+    "\\src\\planning",
+    "\\src\\planning\\planning",
+    "\\src\\planning\\planning\\src",
+    "\\src\\planning\\traj_opt",
+    "\\src\\planning\\traj_opt\\src"
+  ],
+  "SelectedNode": "\\src\\planning\\planning\\src\\planning_nodelet.cpp",
+  "PreviewInSolutionExplorer": false
+}

@@ -1,0 +1,55 @@
+<launch>
+  <group ns="drone0">
+
+    <!-- <node pkg="nodelet" type="nodelet" name="plan_manage" args="manager" output="screen">
+      <param name="num_worker_threads" value="16"/>
+    </node> -->
+
+    <node pkg="nodelet" type="nodelet" name="planning" args="load planning/Nodelet manager" output="screen">
+      <remap from="~odom" to="/vins_fusion/imu_propagate"/>
+      <!-- <remap from="~odom" to="/vins_estimator/imu_propagate"/> -->
+      <remap from="~gridmap_inflate" to="gridmap_inflate"/>
+      <remap from="~heartbeat" to="heartbeat"/>
+      <remap from="~trajectory" to="trajectory"/>
+      <remap from="~replanState" to="replanState"/>
+      <!-- <remap from="~target" to="/object_odom_dtc2brig"/> -->
+      <remap from="~target" to="/target_ekf_node/target_odom"/>
+      <remap from="~triger" to="/triger"/>
+      <remap from="~land_triger" to="/land_triger"/>
+
+      <param name="plan_hz" value="20"/>
+      <param name="ctrl_hz" value="50"/>
+
+      <param name="K" value="8"/>
+      <param name="vmax" value="6.0"/>
+      <param name="amax" value="2.5"/>
+      <param name="rhoT" value="100.0"/>
+      <param name="rhoP" value="10000.0"/>
+      <param name="rhoV" value="1000.0"/>
+      <param name="rhoA" value="1000.0"/>
+      <param name="rhoTracking" value="1000.0"/>
+      <param name="rhosVisibility" value="10000.0"/>
+      <param name="theta_clearance" value="0.6"/>
+      <param name="clearance_d" value="0.2"/>
+      <param name="tolerance_d" value="0.2"/>
+      <param name="tracking_dist" value="1.0"/>
+      <param name="tracking_dur" value="3.0"/>
+      <!-- 预测的时间 -->
+      <param name="tracking_dt" value="0.2"/>
+      <param name="tracking_z" value="1.2"/> 
+      <param name="debug" value="false"/>
+      <param name="fake" value="false"/>
+
+      <param name="prediction/rho_a" value="1.0"/>
+      <param name="prediction/car_z" value="1.0"/>
+      <param name="prediction/vmax" value="2.0"/>
+
+    </node>
+    <node pkg="planning" name="traj_server" type="traj_server" output="screen">
+      <remap from="~position_cmd" to="/position_cmd"/>
+      <remap from="~trajectory" to="trajectory"/>
+      <remap from="~heartbeat" to="heartbeat"/>
+      <param name="time_forward" value="1.0" type="double"/>
+    </node>
+  </group>
+</launch>

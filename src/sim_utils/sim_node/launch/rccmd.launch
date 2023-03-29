@@ -1,0 +1,7 @@
+<launch>
+    <node pkg="sim_node" type="sim_rccmd_node" name="sim_rccmd_node" output="screen">
+        <param name="looprate" type="int" value="100"/>
+    </node>
+</launch>
+
+

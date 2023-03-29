@@ -1,0 +1,42 @@
+{
+  "configurations": [
+    {
+      "browse": {
+        "databaseFilename": "${default}",
+        "limitSymbolsToIncludedHeaders": false
+      },
+      "includePath": [
+        "/opt/ros/noetic/include/**",
+        "/home/anifan/hiauto-landing/sim_gazebo_ws/devel/include/**",
+        "/home/anifan/hiauto-landing/autolanding_ws/devel/include/**",
+        "/home/anifan/hiauto-landing/sim_gazebo_ws/src/cal_node/include/**",
+        "/home/anifan/hiauto-landing/autolanding_ws/src/real_flight_modules/VINS-Fusion/camera_models/include/**",
+        "/home/anifan/hiauto-landing/autolanding_ws/src/planning/DecompROS/decomp_ros_utils/include/**",
+        "/home/anifan/hiauto-landing/autolanding_ws/src/mapping/include/**",
+        "/home/anifan/hiauto-landing/autolanding_ws/src/uav_simulator/mockamap/include/**",
+        "/home/anifan/hiauto-landing/autolanding_ws/src/planning/planning/include/**",
+        "/home/anifan/hiauto-landing/autolanding_ws/src/uav_simulator/odom_vis/pose_utils/include/**",
+        "/home/anifan/hiauto-landing/sim_gazebo_ws/src/px4_ctrl/include/**",
+        "/home/anifan/hiauto-landing/autolanding_ws/src/real_flight_modules/realsense-ros/realsense2_camera/include/**",
+        "/home/anifan/hiauto-landing/sim_gazebo_ws/src/realsense_ros_gazebo/include/**",
+        "/home/anifan/hiauto-landing/autolanding_ws/src/sim_utils/sim_msgs/include/**",
+        "/home/anifan/hiauto-landing/autolanding_ws/src/sim_utils/sim_node/include/**",
+        "/home/anifan/hiauto-landing/autolanding_ws/src/uav_simulator/so3_controller/include/**",
+        "/home/anifan/hiauto-landing/autolanding_ws/src/uav_simulator/so3_quadrotor/include/**",
+        "/home/anifan/hiauto-landing/autolanding_ws/src/planning/traj_opt/include/**",
+        "/home/anifan/hiauto-landing/autolanding_ws/src/sim_utils/true_odom_publisher/include/**",
+        "/home/anifan/hiauto-landing/autolanding_ws/src/real_flight_modules/utils/uav_utils/include/**",
+        "/home/anifan/hiauto-landing/autolanding_ws/src/real_flight_modules/uavsensor/include/**",
+        "/home/anifan/hiauto-landing/autolanding_ws/src/real_flight_modules/usb_cam/include/**",
+        "/home/anifan/tools_ws/src/vis_traj/include/**",
+        "/usr/include/**"
+      ],
+      "name": "ROS",
+      "intelliSenseMode": "gcc-x64",
+      "compilerPath": "/usr/bin/gcc",
+      "cStandard": "gnu11",
+      "cppStandard": "c++14"
+    }
+  ],
+  "version": 4
+}

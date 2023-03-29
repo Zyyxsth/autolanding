@@ -1,0 +1,29 @@
+{
+    "configurations": [
+        {
+          "defines": ["M_PI"],
+            "browse": {
+                "databaseFilename": "",
+                "limitSymbolsToIncludedHeaders": true
+            },
+            "includePath": [
+                "/home/anifan/hiauto-landing/autolanding_ws/devel/include/**",
+                "/home/anifan/hiauto-landing/sim_gazebo_ws/devel/include/**",
+                "/opt/ros/noetic/include/**",
+                "/home/anifan/hiauto-landing/autolanding_ws/src/real_flight_modules/uavsensor/include/**",
+                "/home/anifan/hiauto-landing/autolanding_ws/src/real_flight_modules/utils/uav_utils/include/**",
+                "/home/anifan/hiauto-landing/autolanding_ws/src/real_flight_modules/realsense-ros/realsense2_camera/include/**",
+                "/home/anifan/hiauto-landing/autolanding_ws/src/planning/planning/include/**",
+                "/home/anifan/hiauto-landing/autolanding_ws/src/mapping/include/**",
+                "/home/anifan/hiauto-landing/autolanding_ws/src/planning/DecompROS/decomp_ros_utils/include/**",
+                "/home/anifan/hiauto-landing/autolanding_ws/src/planning/traj_opt/include",
+                "/usr/include/**",
+                "${workspaceFolder}/devel/include"
+            ],
+            "name": "ROS",
+            "cppStandard": "c++11",
+            "intelliSenseMode": "${default}"
+        }
+    ],
+    "version": 4
+}

@@ -1,0 +1,6 @@
+<launch>
+	<node name="vins_fusion" pkg="vins"  type="vins_node" output="screen" args="$(find vins)/../config/fast330_v5_rs435/fast330_v5_rs435.yaml"/>
+
+	<!-- <node name="loop_fusion" pkg="loop_fusion"  type="loop_fusion_node" args="$(find vins)/../config/fast330_v5_rs435/fast330_v5_rs435.yaml" output="screen"/> -->
+
+</launch> 

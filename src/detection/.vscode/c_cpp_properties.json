@@ -1,0 +1,28 @@
+{
+  "configurations": [
+    {
+      "browse": {
+        "databaseFilename": "",
+        "limitSymbolsToIncludedHeaders": true
+      },
+      "includePath": [
+        "/home/fast/fastauto-landing/devel/include/**",
+        "/opt/ros/noetic/include/**",
+        "/home/fast/fastauto-landing/src/VINS-Fusion/camera_models/include/**",
+        "/home/fast/fastauto-landing/src/planning/DecompROS/decomp_ros_utils/include/**",
+        "/home/fast/fastauto-landing/src/mapping/include/**",
+        "/home/fast/fastauto-landing/src/uav_simulator/mockamap/include/**",
+        "/home/fast/fastauto-landing/src/planning/planning/include/**",
+        "/home/fast/fastauto-landing/src/uav_simulator/odom_vis/pose_utils/include/**",
+        "/home/fast/fastauto-landing/src/realsense2_camera/include/**",
+        "/home/fast/fastauto-landing/src/uav_simulator/so3_controller/include/**",
+        "/home/fast/fastauto-landing/src/uav_simulator/so3_quadrotor/include/**",
+        "/home/fast/fastauto-landing/src/planning/traj_opt/include/**",
+        "/home/fast/fastauto-landing/src/uavsensor/include/**",
+        "/usr/include/**"
+      ],
+      "name": "ROS"
+    }
+  ],
+  "version": 4
+}

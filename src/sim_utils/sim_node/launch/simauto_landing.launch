@@ -1,0 +1,127 @@
+<?xml version="1.0"?>
+<launch>
+    <!-- MAVROS posix SITL environment launch script -->
+    <!-- launches MAVROS, PX4 SITL, Gazebo environment, and spawns vehicle -->
+    <!-- vehicle pose -->
+    <!-- <arg name="my_model" default="iris_fpv_cam" /> -->
+    <arg name="my_model" default="iris" />
+
+    <!-- 飞机位姿 -->
+    <arg name="x" default="0"/>
+    <arg name="y" default="0"/>
+    <arg name="z" default="3"/>
+    <arg name="R" default="0"/>
+    <arg name="P" default="0"/>
+    <arg name="Y" default="0"/>
+
+        <!-- 车的位姿 -->
+    <arg name="car_x" default="1.0"/>
+    <arg name="car_y" default="0.0"/>
+    <arg name="car_z" default="3.0"/>
+    <arg name="car_yaw" default="0.0"/>
+
+    <!-- vehicle model and world -->
+    <arg name="est" default="ekf2"/>
+    <arg name="vehicle" default="iris"/>
+    <!-- <arg name="world" default="$(find mavlink_sitl_gazebo)/worlds/empty.world"/> -->
+    <!-- 我的世界路径 -->
+
+
+    <arg name="empty_world" default="/home/anifan/hiauto-landing/autolanding_ws/src/sim_utils/sim_node/worlds/empty_default_ground.world"/> 
+
+    <arg name="world" value="$(arg empty_world)"/>
+
+    <arg name="sdf" default="/home/anifan/hiauto-landing/autolanding_ws/src/sim_utils/sim_node/models/fast330_landing/fast330_landing.sdf"/>
+
+   
+
+    <!-- gazebo configs -->
+    <arg name="gui" default="true"/>
+    <arg name="debug" default="false"/>
+    <arg name="verbose" default="false"/>
+    <arg name="paused" default="false"/>
+    <arg name="respawn_gazebo" default="false"/>
+    <!-- MAVROS configs -->
+    <arg name="fcu_url" default="udp://:14540@localhost:14557"/>
+    <arg name="respawn_mavros" default="false"/>
+    <!-- PX4 configs -->
+    <arg name="interactive" default="true"/>
+    <!-- PX4 SITL and Gazebo -->
+    <!-- <include file="$(find sim_node)/launch/auto_landing_posix_sitl.launch">
+        <arg name="x" value="$(arg x)"/>
+        <arg name="y" value="$(arg y)"/>
+        <arg name="z" value="$(arg z)"/>
+        <arg name="R" value="$(arg R)"/>
+        <arg name="P" value="$(arg P)"/>
+        <arg name="Y" value="$(arg Y)"/>
+        <arg name="car_x" value="$(arg car_x)"/>
+        <arg name="car_y" value="$(arg car_y)"/>
+        <arg name="car_z" value="$(arg car_z)"/>
+        <arg name="car_yaw" value="$(arg car_yaw)"/>
+        <arg name="world" value="$(arg world)"/>
+        <arg name="vehicle" value="$(arg vehicle)"/>
+        <arg name="sdf" value="$(arg sdf)"/>
+        <arg name="gui" value="$(arg gui)"/>
+        <arg name="interactive" value="$(arg interactive)"/>
+        <arg name="debug" value="$(arg debug)"/>
+        <arg name="verbose" value="$(arg verbose)"/>
+        <arg name="paused" value="$(arg paused)"/>
+        <arg name="respawn_gazebo" value="$(arg respawn_gazebo)"/>
+    </include> -->
+
+
+    <!-- PX4 SITL -->
+    <arg unless="$(arg interactive)" name="px4_command_arg1" value="-d"/>
+    <arg     if="$(arg interactive)" name="px4_command_arg1" value=""/>
+    <!-- px4 和 gazebo的连接 -->
+    <node name="sitl" pkg="px4" type="px4" output="screen"
+        args="$(find px4)/build/px4_sitl_default/etc -s etc/init.d-posix/rcS $(arg px4_command_arg1)" required="true"/>
+        <!-- px4的配置文件 -->
+
+    <!-- Gazebo sim -->
+    <!-- 启动gazebo世界 -->
+    <include file="$(find gazebo_ros)/launch/empty_world.launch">
+        <arg name="gui" value="$(arg gui)"/>
+        <!-- 世界在auto_landing_sim里已经改成我的了 -->
+        <arg name="world_name" value="$(arg world)"/>
+        <arg name="debug" value="$(arg debug)"/>
+        <arg name="verbose" value="$(arg verbose)"/>
+        <arg name="paused" value="$(arg paused)"/>
+        <arg name="respawn_gazebo" value="$(arg respawn_gazebo)"/>
+    </include>
+
+        <!-- 产生小车模型 -->
+    <group ns="husky">
+        <include file="$(find husky_gazebo)/launch/spawn_husky.launch">
+            <arg name="x" default="$(arg car_x)"/>
+            <arg name="y" default="$(arg car_y)"/>
+            <arg name="z" default="$(arg car_z)"/>
+            <arg name="yaw" default="$(arg car_yaw)"/>
+            <!-- <arg name="robot_namespace" value="/husky" /> -->
+        </include>
+    </group>
+
+
+    <!-- gazebo model -->
+    <!-- 产生飞机模型 -->
+    <group ns="uav">
+        <node name="$(anon vehicle_spawn)" pkg="gazebo_ros" type="spawn_model" output="screen" args="-sdf -file $(arg sdf) -model $(arg vehicle) -x $(arg x) -y $(arg y) -z $(arg z) -R $(arg R) -P $(arg P) -Y $(arg Y)"/>
+    </group>
+
+
+     <!-- 里程计发布节点 -->
+    <group ns="vins_fusion">
+       <param name="true_odom_pub_rate" value="100"/>
+       <node name="iris_true_odom" pkg="true_odom_publisher" type="true_odom_publisher_node" output="screen" /> 
+    </group>
+
+    <!-- MAVROS -->
+    <!-- 启动mavros -->
+    <include file="$(find mavros)/launch/px4.launch">
+        <!-- GCS link is provided by SITL -->
+        <arg name="gcs_url" value=""/>
+        <arg name="fcu_url" value="$(arg fcu_url)"/>
+        <arg name="respawn_mavros" value="$(arg respawn_mavros)"/>
+    </include>
+
+</launch>

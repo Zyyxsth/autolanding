@@ -1,0 +1,8 @@
+<launch>
+  <group ns="drone0">
+    <node pkg="odom_visualization" name="odom_visualization" type="odom_visualization" output="screen">
+      <remap from="~odom" to="odom" />
+      <param name="robot_scale" value="1.0"/>
+    </node>
+  </group>
+</launch>

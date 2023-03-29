@@ -1,0 +1,22 @@
+<launch>
+  <!-- global map -->
+  <node pkg="mockamap" type="mockamap_node" name="mockamap_node" output="screen">
+    <rosparam file="$(find uav_simulator)/config/mockamap.yaml"/>
+    <remap from="/mock_map" to="/global_map"/>
+  </node>
+
+  <!-- considering visibility -->
+  <group ns="drone0">
+    <include file="$(find mapping)/launch/mapping.launch"/>
+    <include file="$(find planning)/launch/planning.launch">
+      <arg name="rhosVisibility_" value="1.0"/>
+    </include>
+  </group>
+  <!-- without considering visibility -->
+  <group ns="drone1">
+    <include file="$(find mapping)/launch/mapping.launch"/>
+    <include file="$(find planning)/launch/planning.launch">
+      <arg name="rhosVisibility_" value="0.0"/>
+    </include>
+  </group>
+</launch>

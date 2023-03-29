@@ -1,0 +1,89 @@
+<?xml version="1.0"?>
+<launch>
+    <!-- Posix SITL environment launch script -->
+    <!-- launches PX4 SITL, Gazebo environment, and spawns vehicle -->
+    <!-- vehicle pose -->
+    <!-- 产生飞机的位姿 -->
+    <arg name="x" default="0"/>
+    <arg name="y" default="0"/>
+    <arg name="z" default="2"/>
+    <arg name="R" default="0"/>
+    <arg name="P" default="0"/>
+    <arg name="Y" default="0"/>
+
+
+        <!-- 车的位姿 -->
+    <arg name="car_x" default="0.0"/>
+    <arg name="car_y" default="0.0"/>
+    <arg name="car_z" default="0.0"/>
+    <arg name="car_yaw" default="0.0"/>
+
+
+    <!-- vehicle model and world -->
+    <arg name="est" default="ekf2"/>
+    <arg name="vehicle" default="iris"/>
+
+    <!-- <arg name="world" default="$(find mavlink_sitl_gazebo)/worlds/empty.world"/> -->
+
+    <arg name="empty_world" default="/home/anifan/hiauto-landing/sim_gazebo_ws/src/sim_node/worlds/empty.world"/>
+    <arg name="world" default="$(arg empty_world)"/>
+
+    <!-- 在前面已经改成我的了 -->
+    <arg name="sdf" default="$(find mavlink_sitl_gazebo)/models/$(arg vehicle)/$(arg vehicle).sdf"/>
+    <env name="PX4_SIM_MODEL" value="gazebo-classic_$(arg vehicle)" />
+
+    <!-- gazebo configs -->
+    <arg name="gui" default="true"/>
+    <arg name="debug" default="false"/>
+    <arg name="verbose" default="false"/>
+    <arg name="paused" default="false"/>
+    <arg name="respawn_gazebo" default="false"/>
+    <!-- PX4 configs -->
+    <arg name="interactive" default="true"/>
+    <!-- PX4 SITL -->
+    <arg unless="$(arg interactive)" name="px4_command_arg1" value="-d"/>
+    <arg     if="$(arg interactive)" name="px4_command_arg1" value=""/>
+    <!-- px4 和 gazebo的连接 -->
+    <node name="sitl" pkg="px4" type="px4" output="screen"
+        args="$(find px4)/build/px4_sitl_default/etc -s etc/init.d-posix/rcS $(arg px4_command_arg1)" required="true"/>
+        <!-- px4的配置文件 -->
+
+    <!-- Gazebo sim -->
+    <!-- 启动gazebo世界 -->
+    <include file="$(find gazebo_ros)/launch/empty_world.launch">
+        <arg name="gui" value="$(arg gui)"/>
+        <!-- 世界在auto_landing_sim里已经改成我的了 -->
+        <arg name="world_name" value="$(arg world)"/>
+        <arg name="debug" value="$(arg debug)"/>
+        <arg name="verbose" value="$(arg verbose)"/>
+        <arg name="paused" value="$(arg paused)"/>
+        <arg name="respawn_gazebo" value="$(arg respawn_gazebo)"/>
+    </include>
+
+
+
+    <!-- 产生小车模型 -->
+    <group ns="husky">
+        <include file="$(find husky_gazebo)/launch/spawn_husky.launch">
+            <arg name="x" default="$(arg car_x)"/>
+            <arg name="y" default="$(arg car_y)"/>
+            <arg name="z" default="$(arg car_z)"/>
+            <arg name="yaw" default="$(arg car_yaw)"/>
+            <!-- <arg name="robot_namespace" value="/husky" /> -->
+        </include>
+    </group>
+
+
+    <!-- gazebo model -->
+    <!-- 产生飞机模型 -->
+    <group ns="uav">
+        <node name="$(anon vehicle_spawn)" pkg="gazebo_ros" type="spawn_model" output="screen" args="-sdf -file $(arg sdf) -model $(arg vehicle) -x $(arg x) -y $(arg y) -z $(arg z) -R $(arg R) -P $(arg P) -Y $(arg Y)"/>
+    </group>
+
+
+     <!-- 里程计发布节点 -->
+    <group ns="vins_fusion">
+       <param name="true_odom_pub_rate" value="100"/>
+       <node name="iris_true_odom" pkg="true_odom_publisher" type="true_odom_publisher_node" output="screen" /> 
+    </group>
+</launch>

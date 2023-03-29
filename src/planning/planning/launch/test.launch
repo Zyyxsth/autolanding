@@ -1,0 +1,30 @@
+<launch>
+  <node pkg="mockamap" type="mockamap_node" name="mockamap_node" output="screen">
+    <rosparam file="$(find uav_simulator)/config/mockamap.yaml"/>
+    <remap from="/mock_map" to="/global_map"/>
+  </node>
+  <node pkg="nodelet" type="nodelet" name="manager" args="manager" output="screen">
+    <param name="num_worker_threads" value="16"/>
+  </node>
+  <node pkg="nodelet" type="nodelet" name="mapping" args="load mapping/Nodelet manager" output="screen">
+    <!-- global map parameters -->
+    <rosparam file="$(find uav_simulator)/config/mockamap.yaml"/>
+    <!-- remap topics -->
+    <remap from="~global_map" to="/global_map"/>
+    <remap from="~gridmap" to="gridmap"/>
+    <remap from="~gridmap_inflate" to="gridmap_inflate"/>
+    <!-- mapping parameters -->
+    <param name="resolution" value="0.15"/>
+    <param name="inflate_size" value="1"/>
+    <param name="use_global_map" value="true"/>
+  </node>
+  <node pkg="planning" type="test_node" name="test_node" output="screen">
+    <remap from="~gridmap_inflate" to="gridmap_inflate"/>
+    <remap from="~triger" to="/move_base_simple/goal"/>
+    <param name="tracking_dur" value="3.0"/>
+    <param name="tracking_dt" value="0.1"/>
+    <param name="prediction/rho_a" value="1.0"/>
+    <param name="prediction/car_z" value="1.5"/>
+    <param name="prediction/vmax" value="4.0"/>
+  </node>
+</launch>

@@ -1,0 +1,9 @@
+<launch>
+    <node pkg="uavsensor" type="relayctrl_node" name="relayctrl_node" output="screen">
+        <param name="serial_port" type="string" value="/dev/ttyUSB_relay"/>
+        <param name="bandrate" type="int" value="9600"/>
+        <param name="looprate" type="int" value="100"/>
+    </node>
+</launch>
+
+
