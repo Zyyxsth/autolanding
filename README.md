@@ -67,8 +67,5 @@ Step1: 发布信息降落完成。
       获得降落时飞机的位置和四元数
 ```
 
-
-
-
 Debug mode 就不介绍了
 ![image](https://user-images.githubusercontent.com/95516449/228598666-bdb0814e-619c-4a11-9278-cc4b2c22b3db.png)
