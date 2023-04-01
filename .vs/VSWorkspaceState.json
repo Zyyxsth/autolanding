@@ -2,12 +2,9 @@
   "ExpandedNodes": [
     "",
     "\\src",
-    "\\src\\planning",
-    "\\src\\planning\\planning",
-    "\\src\\planning\\planning\\src",
-    "\\src\\planning\\traj_opt",
-    "\\src\\planning\\traj_opt\\src"
+    "\\src\\detection",
+    "\\src\\detection\\target_ekf",
+    "\\src\\detection\\target_ekf\\src"
   ],
-  "SelectedNode": "\\src\\planning\\planning\\src\\planning_nodelet.cpp",
   "PreviewInSolutionExplorer": false
 }

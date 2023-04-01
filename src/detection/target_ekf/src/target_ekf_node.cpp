@@ -27,10 +27,10 @@ typedef message_filters::Synchronizer<ApriltagOdomSyncPolicy>
 ros::Publisher target_odom_pub_, yolo_odom_pub_;
 
 Eigen::Matrix3d cam2body_R_front_, cam2body_R_down_;
-Eigen::Vector3d cam2body_p_front_, cam2body_p_down_;
+Eigen::Vector3d cam2body_p_front_, cam2body_p_down_;  //因为有两个摄像头吗，所以一个是前面的，一个是底下的
 
 Eigen::Matrix3d cam2body_R_realsense;
-Eigen::Vector3d cam2body_p_realsense;
+Eigen::Vector3d cam2body_p_realsense;       //深度摄像机realsense的位置
 ros::Publisher april_odom_realsense;
 double fx_r,fy_r,cx_r,cy_r;
 
@@ -45,14 +45,14 @@ Eigen::Quaterniond q_;
 
 struct Ekf {
   double dt;
-  Eigen::MatrixXd A, B, C;
-  Eigen::MatrixXd Qt, Rt;
-  Eigen::MatrixXd Sigma, K;
-  Eigen::VectorXd x;
+  Eigen::MatrixXd A, B, C;               //A就是A，B就是B，C是指的是H
+  Eigen::MatrixXd Qt, Rt;                //Qt是过程噪声的协方差矩阵,Rt是测量噪声的协方差矩阵
+  Eigen::MatrixXd Sigma, K;            //sigma先验误差的协方差矩阵, K 卡尔曼增益
+  Eigen::VectorXd x;                    //前面3个是位置，后面3个是速度
 
   Ekf(double _dt) : dt(_dt) {
-    A.setIdentity(6, 6);
-    Sigma.setZero(6, 6); // 噪声
+    A.setIdentity(6, 6);                              //6x6
+    Sigma.setZero(6, 6); // 
     B.setZero(6, 3);
     C.setZero(3, 6);
     A(0, 3) = dt;
@@ -71,10 +71,10 @@ struct Ekf {
     K = C;
     Qt.setIdentity(3, 3);
     Rt.setIdentity(3, 3);
-    Qt(0, 0) = 4;
+    Qt(0, 0) = 4;                                  //Q是过程噪声的协方差矩阵      
     Qt(1, 1) = 4;
     Qt(2, 2) = 1;
-    Rt(0, 0) = 0.1;
+    Rt(0, 0) = 0.1;                                //R是测量噪声的协方差矩阵
     Rt(1, 1) = 0.1;
     Rt(2, 2) = 0.1;
     x.setZero(6);
@@ -83,7 +83,7 @@ struct Ekf {
 
   inline void predict() {
     x = A * x;
-    Sigma = A * Sigma * A.transpose() + B * Qt * B.transpose();
+    Sigma = A * Sigma * A.transpose() + B * Qt * B.transpose();   //先验误差的协方差矩阵为：〖P^−〗_k=A〖P^−〗_(k−1) A^T+B_K  Q〖B_K〗^T
     return;
   }
   inline void reset(const Eigen::Vector3d& z) {
@@ -91,20 +91,20 @@ struct Ekf {
     x.tail(3).setZero();
     Sigma.setZero();
   }
-  inline bool checkValid(const Eigen::Vector3d& z) const {
-    Eigen::MatrixXd K_tmp = Sigma * C.transpose() * (C * Sigma * C.transpose() + Rt).inverse();
-    Eigen::VectorXd x_tmp = x + K_tmp * (z - C * x);
+  inline bool checkValid(const Eigen::Vector3d& z) const {                      //z明显是测量出来的
+    Eigen::MatrixXd K_tmp = Sigma * C.transpose() * (C * Sigma * C.transpose() + Rt).inverse();  //K_k=P^− H^T 〖(HP^− H^T+C_k R〖C_k〗^T)〗^(−1)
+    Eigen::VectorXd x_tmp = x + K_tmp * (z - C * x);   //那么再求后验估计：X ̂_k=〖X ̂_k〗^−+K_k (Z_k−hx ̂_k, 0))
     const double vmax = 4;
-    if (x_tmp.tail(3).norm() > vmax) {
+    if (x_tmp.tail(3).norm() > vmax) {      //速度不能超过临界值
       return false;
     } else {
       return true;
     }
   }
   inline void update(const Eigen::Vector3d& z) {
-    K = Sigma * C.transpose() * (C * Sigma * C.transpose() + Rt).inverse();
-    x = x + K * (z - C * x);
-    Sigma = Sigma - K * C * Sigma;
+    K = Sigma * C.transpose() * (C * Sigma * C.transpose() + Rt).inverse();  //更新卡尔曼滤波的增益
+    x = x + K * (z - C * x);                             //这就是求出来的后验估计X ̂_k=〖X ̂_k〗^−+K_k (Z_k−hx ̂_k, 0))
+    Sigma = Sigma - K * C * Sigma;                       //P =(I−K_k H) P^− 
   }
 
   // 取前三个作为位置
@@ -130,7 +130,7 @@ void predict_state_callback(const ros::TimerEvent& event) {
     return;
   }
   // publish target odom
-  nav_msgs::Odometry target_odom;
+  nav_msgs::Odometry target_odom;             //汽车的里程计的相关信息
   target_odom.header.stamp = ros::Time::now();
   target_odom.header.frame_id = "world";
   target_odom.pose.pose.position.x = ekfPtr_->pos().x();
@@ -152,7 +152,7 @@ void update_state_realsense_callback(const target_ekf::AprilTagDetectionArrayCon
       ROS_INFO("realsense find apriltag!");
   }
 
-  Eigen::Vector3d odom_p;  // NOTE: (By HJ)这是VIO提供的odom 为机体的位姿
+  Eigen::Vector3d odom_p;  // NOTE: (By HJ)这是VIO提供的odom 为机体的位姿，飞机的相关信息， odom下飞机的相关信息
   Eigen::Quaterniond odom_q;
   odom_p(0) = odom_msg->pose.pose.position.x;
   odom_p(1) = odom_msg->pose.pose.position.y;
@@ -179,11 +179,11 @@ void update_state_realsense_callback(const target_ekf::AprilTagDetectionArrayCon
   double x = april_tag_msg->detections[0].pose.pose.pose.position.x;
   double y = april_tag_msg->detections[0].pose.pose.pose.position.y;
   double z = april_tag_msg->detections[0].pose.pose.pose.position.z;
-  Eigen::Vector3d p(x, y, z); // 
+  Eigen::Vector3d p(x, y, z); // 这个p是在摄像头下二维码的位置
   // std::cout << "p cam frame: " << p.transpose() << std::endl;
 
   // get tag's odom in the world frame 位置
-  p = cam_q * p + cam_p;
+  p = cam_q * p + cam_p;  //二维码标志在世界坐标系下的位置
   // 20221021 debug 
   nav_msgs::Odometry pose_april_f;
   pose_april_f.header.frame_id="world";
@@ -203,7 +203,7 @@ void update_state_realsense_callback(const target_ekf::AprilTagDetectionArrayCon
   // update target odom
   double update_dt = (ros::Time::now() - last_update_stamp_).toSec();
   if (update_dt > 3.0) {
-    ekfPtr_->reset(p);
+    ekfPtr_->reset(p);                     //超过3s二维码速度设为0，不知道为什么
     ROS_WARN("[realsense] ekf reset!");
   } else if (ekfPtr_->checkValid(p)) { 
     ekfPtr_->update(p); // 在这里update
@@ -234,13 +234,13 @@ void update_state_front_callback(const target_ekf::AprilTagDetectionArrayConstPt
   odom_q.z() = odom_msg->pose.pose.orientation.z;
 
   // 从VIO odom (飞机坐标系)得到camera的位置
-  Eigen::Vector3d cam_p = odom_q.toRotationMatrix() * cam2body_p_front_ + odom_p;
+  Eigen::Vector3d cam_p = odom_q.toRotationMatrix() * cam2body_p_front_ + odom_p;  //差不多就是求世界系下的摄像头的位置
 
-  // 相机在世界系下的姿态
-  Eigen::Quaterniond cam_q = odom_q * Eigen::Quaterniond(cam2body_R_front_);
+  // 相机在世界系下的姿态（VIO约等于世界系）
+  Eigen::Quaterniond cam_q = odom_q * Eigen::Quaterniond(cam2body_R_front_);          //求世界系下摄像头的姿态
 
   // if there is no detection, return!
-  if (april_tag_msg->detections.size() == 0) {
+  if (april_tag_msg->detections.size() == 0) {                         //没有找到检测物，返回
     // ROS_ERROR("cannot find apriltag!");
     // ROS_INFO("front camera cannot find apriltag!");
     return;
@@ -251,7 +251,7 @@ void update_state_front_callback(const target_ekf::AprilTagDetectionArrayConstPt
   double x = april_tag_msg->detections[0].pose.pose.pose.position.x;
   double y = april_tag_msg->detections[0].pose.pose.pose.position.y;
   double z = april_tag_msg->detections[0].pose.pose.pose.position.z;
-  Eigen::Vector3d p(x, y, z); // 
+  Eigen::Vector3d p(x, y, z); // 这个p是在摄像头下二维码的位置
   // std::cout << "p cam frame: " << p.transpose() << std::endl;
 
   // get tag's odom in the world frame 位置
@@ -264,20 +264,20 @@ void update_state_front_callback(const target_ekf::AprilTagDetectionArrayConstPt
   pose_april_f.pose.pose.position.z=p(2);
   april_odom_front.publish(pose_april_f);
 
-  q_.w() = april_tag_msg->detections[0].pose.pose.pose.orientation.w;
+  q_.w() = april_tag_msg->detections[0].pose.pose.pose.orientation.w;  //这个q_是在摄像头下二维码的姿态
   q_.x() = april_tag_msg->detections[0].pose.pose.pose.orientation.x;
   q_.y() = april_tag_msg->detections[0].pose.pose.pose.orientation.y;
   q_.z() = april_tag_msg->detections[0].pose.pose.pose.orientation.z;
 
   // get tag's odom in the world frame 姿态
-  q_ = cam_q * q_;
+  q_ = cam_q * q_;  //
 
   // update target odom
   double update_dt = (ros::Time::now() - last_update_stamp_).toSec();
   if (update_dt > 3.0) {
     ekfPtr_->reset(p);
     ROS_WARN("ekf reset!");
-  } else if (ekfPtr_->checkValid(p)) { 
+  } else if (ekfPtr_->checkValid(p)) {                 //检查是否超过了速度的限制
     ekfPtr_->update(p); // 在这里update
   } else {
     ROS_ERROR("update invalid!");
@@ -413,6 +413,10 @@ int main(int argc, char** argv) {
   april_odom_front = nh.advertise<nav_msgs::Odometry>("april_odom_front", 1); // 发布
   april_odom_down = nh.advertise<nav_msgs::Odometry>("april_odom_down", 1);
   april_odom_realsense=nh.advertise<nav_msgs::Odometry>("april_odom_realsense",1);
+  //advertise()函数是你告诉ROS你想在给定的话题名上发布特定类型的消息。
+     //在这个advertise()调用之后，master节点将通知任何试图订阅这个话题名称的节点，然后他们将与这个节点建立一个对等网络（peer to peer / P2P）连接。
+      //advertise()括号里面的第一个参数是话题名字，第二个参数是用于发布消息的消息队列的大小。
+     //<>里面指定消息的类型
 
   int ekf_rate = 20;
   nh.getParam("ekf_rate", ekf_rate);
